@@ -1,34 +1,27 @@
-function skip(days: number[], daysToSkip: number) {
-  for (let i = 1; i < days.length; i++) {
-    if (days[i] - days[0] >= daysToSkip) {
-      return days.slice(i);
+function mincostTickets(days: number[], costs: number[]): number {
+  const set = new Set(days);
+  const cache = new Map();
+  const dp = (day: number): number => {
+    if (day > 365) {
+      return 0;
     }
-  }
-  return [];
-}
-
-const cache = new Map();
-function mincostTickets(
-  days: number[],
-  costs: number[],
-  initial = true
-): number {
-  if (days.length === 0) {
-    return 0;
-  }
-  if (initial) {
-    cache.clear();
-  }
-  if (cache.has(days[0])) {
-    return cache.get(days[0]);
-  }
-  const result = Math.min(
-    costs[0] + mincostTickets(skip(days, 1), costs, false),
-    costs[1] + mincostTickets(skip(days, 7), costs, false),
-    costs[2] + mincostTickets(skip(days, 30), costs, false)
-  );
-  cache.set(days[0], result);
-  return result;
+    if (cache.has(day)) {
+      return cache.get(day);
+    }
+    let result = 0;
+    if (set.has(day)) {
+      result = Math.min(
+        costs[0] + dp(day + 1),
+        costs[1] + dp(day + 7),
+        costs[2] + dp(day + 30)
+      );
+    } else {
+      result = dp(day + 1);
+    }
+    cache.set(day, result);
+    return result;
+  };
+  return dp(1);
 }
 
 console.log(
